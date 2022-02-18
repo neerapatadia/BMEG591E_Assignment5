@@ -58,10 +58,16 @@ ChIP-seq experiments require a control against which to compare the ChIP signnal
 ## Tip: Remember to add the .bw extension to your specified output! 
 #?# Type the commands you use for converting each of the 4 bam files to bigwig files - 2 pts
 ## input_chr3_subset.bam
+bamCoverage -b /projects/bmeg/A5/input_chr3_subset.bam -o /home/npatadia_bmeg22/assignment5_bmeg591e/input_chr3_subset.bw
+
 ## H3K4me3_chr3_subset.bam
+bamCoverage -b /projects/bmeg/A5/H3K4me3_chr3_subset.bam -o /home/npatadia_bmeg22/assignment5_bmeg591e/H3K4me3_chr3_subset.bw
+
 ## H3K27me3_chr3_subset.bam
+bamCoverage -b /projects/bmeg/A5/H3K27me3_chr3_subset.bam -o /home/npatadia_bmeg22/assignment5_bmeg591e/H3K27me3_chr3_subset.bw
  
 ## H3K27ac_chr3_subset.bam
+bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o /home/npatadia_bmeg22/assignment5_bmeg591e/H3K27ac_chr3_subset.bw
  
 ### Follow this steps: 
 ## 1. Copy the bigwig files from the previous steps to your computer 
@@ -69,7 +75,11 @@ ChIP-seq experiments require a control against which to compare the ChIP signnal
 ## Tip: use the "File" tab to "load from file" option to choose the files from your computer directories
 ## 3. Change the visualization of the files to see the following position: ** chr3:93,470,124-93,471,058 **
 #?# Include a screenshot of your IGV session right after this code chunk (using the Rmarkdown syntax)  - 2 pt
+
 #?# Explore this region by zooming in and out and navigating around. What do you see? Is there something similar across all the different files that stands out on this region? Is there anything peculiar about the DNA sequence at this locus?- 3 pt
+
+
+
 ## Tip: sometimes track signal will be truncated to a pre-set maximum. If you right-click the track label (left) and select "autoscale", it will automatically adust the scales of the track to the range of your data. Try playing around with the track settings to see their effect.
 ## 4. This file (/projects/bmeg/A5/hg38_blacklisted_regions.bed) contains the hg38 blacklisted regions. Load it into IGV along with all the other files. 
 ## 5. Look at the following region again (chr3:93,470,124-93,471,058). 
@@ -77,8 +87,7 @@ ChIP-seq experiments require a control against which to compare the ChIP signnal
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
-
-
+![Screenshot of IGV Session](/Users/neera/Documents/BMEG_591E/BMEG591E_Assignment5/screenshots/IGV_screenshot.png)
 
 ## 2. Narrow vs Broad peaks 
 
