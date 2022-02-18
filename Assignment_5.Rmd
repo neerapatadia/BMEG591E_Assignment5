@@ -104,7 +104,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
 
-![](iPSC_deeptools.png)
+
 
 ```{bash, eval=FALSE}
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
@@ -155,7 +155,7 @@ Macs2 calls the peaks by analyzing the enrichments of sequences in the genome co
 #?# Are these visually enriched regions you selected, found in file d (narrowPeak)? What does that mean? - 1 pt
 #?# Add a screenshot of your IGV session right after this chunk, using Rmarkdown syntax - 1pt
 ```
-![](peaks_summary.png)
+<add peak summaryhere>
 
 
 ### c. Peak enrichments
