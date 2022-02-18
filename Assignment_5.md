@@ -117,12 +117,16 @@ bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o /home/npatadia_bmeg2
 
 #?# Explore this region by zooming in and out and navigating around. What do you see? Is there something similar across all the different files that stands out on this region? Is there anything peculiar about the DNA sequence at this locus?- 3 pt
 
-
+#They all appear to have a peak around the 93,400,600 basepair region
+#The H3K27me3_chr3_subset (track 3) appears to have two smaller peaks around the 93,470,000 and 93,470,200 base pair regions
+#Main peak that occurs around the 93,400,600 basepair region appears to occur near the chromosome centromere
 
 ## Tip: sometimes track signal will be truncated to a pre-set maximum. If you right-click the track label (left) and select "autoscale", it will automatically adust the scales of the track to the range of your data. Try playing around with the track settings to see their effect.
 ## 4. This file (/projects/bmeg/A5/hg38_blacklisted_regions.bed) contains the hg38 blacklisted regions. Load it into IGV along with all the other files. 
 ## 5. Look at the following region again (chr3:93,470,124-93,471,058). 
 #?# What can you say now about the similarities between the files at this region? In your own words, explain what a blacklisted region is and if you think this region should be excluded a ChIP-seq analysis. - 1.5 pt
+
+#The black listed file is basically showing problematic regions in the genome.
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
