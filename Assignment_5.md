@@ -72,6 +72,9 @@ the practical part, make sure you have them all installed.
 
 ``` bash
 #?# Add macs2 and deeptools to your environment created on A1 - 1 pt
+conda install -c bioconda macs2
+conda install -c bioconda deeptools
+
 ## Install IGV to your local computer after downloading it from: https://software.broadinstitute.org/software/igv/home
 ```
 

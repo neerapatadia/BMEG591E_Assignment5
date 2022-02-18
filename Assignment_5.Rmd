@@ -41,6 +41,9 @@ We will be using a couple of new tools this time. Before we move on to the pract
 
 ```{bash, eval=FALSE}
 #?# Add macs2 and deeptools to your environment created on A1 - 1 pt
+conda install -c bioconda macs2
+conda install -c bioconda deeptools
+
 ## Install IGV to your local computer after downloading it from: https://software.broadinstitute.org/software/igv/home
 ```
 
