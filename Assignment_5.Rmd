@@ -136,6 +136,11 @@ plotHeatmap -m output_matrix_part2 -o heatmap_part2.png --hclust 3 --colorMap 'B
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
 #?# Type the commands you used for this below - 1 pt
 
+#first need to compute the matrix
+computeMatrix scale-regions -S /home/npatadia_bmeg22/assignment5_bmeg591e/bigwig_files/input_chr3_subset.bw /home/npatadia_bmeg22/assignment5_bmeg591e/bigwig_files/H3K4me3_chr3_subset.bw /home/npatadia_bmeg22/assignment5_bmeg591e/bigwig_files/H3K27me3_chr3_subset.bw -R /projects/bmeg/A5/reference_genes.bed -b 1000 -a 1000 -o output_matrix_part2_not_norm
+
+#next generate heatmap from matrix
+plotHeatmap -m output_matrix_part2_not_norm -o heatmap_part2_not_norm.png --hclust 3 --colorMap 'Blues'
 
 #?# Include a screenshot of this analysis, below this code block. - 1 pt
 
@@ -146,7 +151,7 @@ plotHeatmap -m output_matrix_part2 -o heatmap_part2.png --hclust 3 --colorMap 'B
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
-
+![Screenshot of IGV Session](heatmap_part2_not_norm.png)
 
 ## 3. Peak calling 
 
