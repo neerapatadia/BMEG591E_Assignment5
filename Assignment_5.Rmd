@@ -87,7 +87,7 @@ bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o /home/npatadia_bmeg2
 ## 5. Look at the following region again (chr3:93,470,124-93,471,058). 
 #?# What can you say now about the similarities between the files at this region? In your own words, explain what a blacklisted region is and if you think this region should be excluded a ChIP-seq analysis. - 1.5 pt
 
-#The black listed file is basically showing problematic regions in the genome.
+#The black listed file is basically showing problematic regions in the genome. This region should be excluded from CHIP-Seq analysis because it is showing regions in the HG38 genome that are low confidence, meaning that there isn't a ton of evidence to suggest that the region is actually accurate for the population. 
 
 ```
 
@@ -121,15 +121,16 @@ plotHeatmap -m output_matrix_part2 -o heatmap_part2.png --hclust 3 --colorMap 'B
 
 
 #?# Add a screenshot of the plot right after this code chunk using Rmarkdown syntaxis - 1 pt 
-
-
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
-
+#x axis labels TSS and TES refer to transcription start site and transcription end site
+#y axis on line graph refers to the number of reads mapping to a given region
+#Darker colours on head map correspond to more reads mapping to a given region in the heatmap
+#This in turn also lines up with the peaks on the line charts above.
 
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
-![Screenshot of IGV Session](heatmap_part2.png)
+![Heatmap Screenshot](heatmap_part2.png)
 
 
 ```{bash, eval=FALSE}
@@ -147,9 +148,10 @@ plotHeatmap -m output_matrix_part2_not_norm -o heatmap_part2_not_norm.png --hclu
 
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
 
-#scores are lower overall for all calls 
-#legit because the reads are not normalized, so it's basically like comparing 
-#apples to oranges.
+#number of reads mapping to region much lower 
+#No peaks for input and H3Kme27 subsets
+#Since the data is not normalized, we are basically looking at the data on drastically differing scales 
+#therefore making it appear that there are no peaks for a given region.
 
 ```
 
@@ -243,9 +245,18 @@ plotHeatmap -m H3k27ac_matrix -o H3k27ac_matrix.png --hclust 3 --colorMap 'Blues
 
 ```{}
 #?# Do you see an overlap between the peaks of different epigenetic marks? Which epigenetic marks? - 1 pt
+Yes, the middle peak appears to overlap between the transcription start and end sites for all three epigenetic markers. 
+However it is important to note that H3K4 one is higher (scale goes to 4 on the line chart).
+
 #?# Why do you think these epigenetic marks overlap? - 1 pt
+The peaks are overlapping for the markers because they are representing highly methylated regions
+
 #?# Explain the pattern you see for the peaks of H3K27me3, do they look similar or different to the other two marks? Why do you think this happens? - 1pt
+Peaks are slightly different, as it is high downstream and low upstream of the TSS and TES.
+
 #?# Why do you think the borders of the elements have such clearly-defined borders with respect to the ChIP signal? -1 pt
+They are defined by the transcription start and end sites.
+
 ```
 
 
