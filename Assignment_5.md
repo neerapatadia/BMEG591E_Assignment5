@@ -130,8 +130,7 @@ bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o /home/npatadia_bmeg2
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
-![Screenshot of IGV
-Session](/Users/neera/Documents/BMEG_591E/BMEG591E_Assignment5/screenshots/IGV_screenshot.png)
+![Screenshot of IGV Session](IGV_screenshot.png)
 
 ## 2\. Narrow vs Broad peaks
 
@@ -157,7 +156,7 @@ Here, we’re going to inspect their distributions relative to genes.
 ## - Include the surrounding 1kb
 ## - Use all 3 input-normalized bigWig files (H3K4me3, H3K27ac, H3K27me3) as signal tracks
 #?# Write the command you used to run it below: - 1.5 pt
-
+computeMatrix scale-regions -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R /projects/bmeg/A5/reference_genes.bed -b 1000 -a 1000 -o output_matrix_part2
 
 ## Now that the scores matrix has been computed, we can use it to create a heatmap to provide a better visual representation of the reads distrubution across our reference genes (provided in the reference_genes.bed file)
 ## Use the deepTools ** plotHeatmap ** function to create a heatmap following this criteria: 
@@ -165,6 +164,7 @@ Here, we’re going to inspect their distributions relative to genes.
 ## - Use the Blues colormap
 ## - Create 3 clusters within the heatmap according to the patterns of the reads distrubution across the files using heirarchical clustering
 #?# Type the command you used to run it below: - 1.5
+plotHeatmap -m output_matrix_part2 -o heatmap_part2.png --hclust 3 --colorMap 'Blues'
 
 
 #?# Add a screenshot of the plot right after this code chunk using Rmarkdown syntaxis - 1 pt 
@@ -173,7 +173,8 @@ Here, we’re going to inspect their distributions relative to genes.
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
 ```
 
-**Add screenshot here: ** (Use Rmarkdown syntax)
+**Add screenshot here: ** (Use Rmarkdown syntax) ![Screenshot of IGV
+Session](heatmap_part2.png)
 
 ``` bash
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
