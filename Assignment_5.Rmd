@@ -109,14 +109,22 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 ## - Include the surrounding 1kb
 ## - Use all 3 input-normalized bigWig files (H3K4me3, H3K27ac, H3K27me3) as signal tracks
 #?# Write the command you used to run it below: - 1.5 pt
+computeMatrix scale-regions -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R /projects/bmeg/A5/reference_genes.bed -b 1000 
+
 ## Now that the scores matrix has been computed, we can use it to create a heatmap to provide a better visual representation of the reads distrubution across our reference genes (provided in the reference_genes.bed file)
 ## Use the deepTools ** plotHeatmap ** function to create a heatmap following this criteria: 
 ## - Use the matrix from the previous point
 ## - Use the Blues colormap
 ## - Create 3 clusters within the heatmap according to the patterns of the reads distrubution across the files using heirarchical clustering
 #?# Type the command you used to run it below: - 1.5
+
+
 #?# Add a screenshot of the plot right after this code chunk using Rmarkdown syntaxis - 1 pt 
+
+
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
+
+
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
@@ -126,8 +134,14 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 ```{bash, eval=FALSE}
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
 #?# Type the commands you used for this below - 1 pt
+
+
 #?# Include a screenshot of this analysis, below this code block. - 1 pt
+
+
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
+
+
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
@@ -146,6 +160,8 @@ Now we want to identify enriched regions of the genome for each of our three his
 ## Each time, use the input as the control 
 ## For H3K27Me3, you should call "broad" peaks because these signals tend to form longer domains and not acute peaks.
 #?# Type the commands you used below: - 1.5 pt
+
+
 ```
 
 

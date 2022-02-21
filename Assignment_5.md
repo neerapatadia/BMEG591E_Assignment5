@@ -157,13 +157,19 @@ Here, we’re going to inspect their distributions relative to genes.
 ## - Include the surrounding 1kb
 ## - Use all 3 input-normalized bigWig files (H3K4me3, H3K27ac, H3K27me3) as signal tracks
 #?# Write the command you used to run it below: - 1.5 pt
+
+
 ## Now that the scores matrix has been computed, we can use it to create a heatmap to provide a better visual representation of the reads distrubution across our reference genes (provided in the reference_genes.bed file)
 ## Use the deepTools ** plotHeatmap ** function to create a heatmap following this criteria: 
 ## - Use the matrix from the previous point
 ## - Use the Blues colormap
 ## - Create 3 clusters within the heatmap according to the patterns of the reads distrubution across the files using heirarchical clustering
 #?# Type the command you used to run it below: - 1.5
+
+
 #?# Add a screenshot of the plot right after this code chunk using Rmarkdown syntaxis - 1 pt 
+
+
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
 ```
 
@@ -172,7 +178,11 @@ Here, we’re going to inspect their distributions relative to genes.
 ``` bash
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
 #?# Type the commands you used for this below - 1 pt
+
+
 #?# Include a screenshot of this analysis, below this code block. - 1 pt
+
+
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
 ```
 
