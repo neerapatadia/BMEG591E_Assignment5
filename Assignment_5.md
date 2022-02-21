@@ -190,6 +190,10 @@ plotHeatmap -m output_matrix_part2_not_norm -o heatmap_part2_not_norm.png --hclu
 
 
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
+
+#scores are lower overall for all calls 
+#legit because the reads are not normalized, so it's basically like comparing 
+#apples to oranges.
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax) ![Screenshot of IGV
@@ -273,8 +277,4 @@ with the authors and their contributions to the assignment. If you
 worked alone, only the author (e.g. your name and student ID) should be
 included.
 
-Authors: Name1 (studentID1) and Name2 (studentID2)
-
-Contributions: (example) N1 and N2 worked together on the same computer
-to complete the assignment. N1 typed for the first half and N2 typed for
-the second half.
+Authors: Neera Patadia (79557773)
