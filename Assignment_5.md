@@ -300,10 +300,10 @@ plotHeatmap -m H3k27ac_matrix -o H3k27ac_matrix.png --hclust 3 --colorMap 'Blues
     The peaks are overlapping for the markers because they are representing highly methylated regions
     
     #?# Explain the pattern you see for the peaks of H3K27me3, do they look similar or different to the other two marks? Why do you think this happens? - 1pt
-    Peaks are slightly different, as it is high downstream and low upstream of the TSS and TES.
+    Peaks patterns are slightly different in the upstream and downstream regions of TSS and TES, where instead of both the upstream and downstream regions being below the peak, they are higher downstream and lower upstream. Additionally the centeral peak is much broader as opposed to the "sharper" peaks for the other two, which is probably because the --broad flag was used when running the macs2 call in the previous step
     
     #?# Why do you think the borders of the elements have such clearly-defined borders with respect to the ChIP signal? -1 pt
-    They are defined by the transcription start and end sites.
+    They are defined by the transcription start and end sites. The areas surrounding the TSS and TES have lower peaks for most of the curves in the line charts, indivuating that the methulation level is lower surrounding the segment of interest.
 
 # Assignment submission
 
