@@ -188,6 +188,10 @@ frames2 <- frames2 %>% remove_rownames %>% column_to_rownames(var="atac_reads_fi
 cor_mat <- cor(frames2)
 cor_mat
 heatmap(cor_mat)
+melt_cor <- melt(cor_mat)
+melt_cor
+ggplot(melt_cor, aes(x = X1, y = X2, fill = value)) + geom_tile() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
 
@@ -200,10 +204,34 @@ heatmap(cor_mat)
 
 ### `#?#` *Filter your data, retaining only regions where the average counts per sample is greater than 10, and also remove mitochondrial regions - 3 pt*
 ```{r}
+frame3 <- data.frame(atac_reads_filtered$variable, atac_reads_filtered$value, atac_reads_filtered$region)
+#frame
+frames4 <- spread(frame3, key = atac_reads_filtered.variable, value = atac_reads_filtered.value)
+
+frames4 <- frames4 %>% remove_rownames %>% column_to_rownames(var="atac_reads_filtered.region")
+frames5 <- frames4[ ,colMeans(frames4[sapply(frames4,is.numeric)]) > 10]
+
+
+frames5 <-  mutate(frames5, chr = sapply(str_split(as.character(rownames(frames5) ), ":"), function(x) x[[1]][1]) )
+frames5_filtered <- frames5[frames5$chr != "chrM", ]
+
+
 ```
 
 ### `#?#` *How many peaks did you have before? How many do you have now? - 1 pt*
 ```{r}
+frames5_filtered <- rownames_to_column(frames5_filtered, var = "region")
+frame_5_melt <- melt(frames5_filtered)
+frame_5_melt$cpm <- cpm(frame_5_melt$value)
+frame_5_melt$log_pseudo <- log(frame_5_melt$cpm + 1)
+frame_5_melt
+
+ggplot(data = frame_5_melt, aes(x = log_pseudo, color = variable)) +
+  geom_density() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+#before, there was 1 central peak. Now there are two peaks
+
 ```
 
 
@@ -216,6 +244,13 @@ heatmap(cor_mat)
 
 ### `#?#` *Make a count matrix called `countMatrix` for the BI_protac and control samples, including only the peaks we retained above - 2 pt*
 ```{r}
+#remove non-numeric values from the matric
+countMatrix <- frames5_filtered %>% remove_rownames %>% column_to_rownames(var = "region")
+
+                                                                          
+countMatrix$chr <- NULL
+#show the matrix
+head(countMatrix)
 ```
 
 *EdgeR is exceptionally versatile, with many different options for analysis. Today, you're going to use the GLM-quasi-likelihood approach to calculate differential accessibility. We are providing the first example analysis below, which you can modify in subsequent steps. You will need to understand what the steps do, so read the appropriate documentation. *
@@ -238,10 +273,21 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 
 ### `#?#` *Make an MA plot for allDEStatsPairedTreatControlvsProtac -2pt*
 ```{r}
+ggplot(data = allDEStatsPairedTreatControlvsProtac, mapping = aes(x = logCPM, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "blue", size = 1.0)  +
+  stat_smooth(method = "loess", se = FALSE, colour = "red")
+  
+
+
 ```
 
 ### `#?#` *Make an MA plot for allDEStatsPairedTime6vs24 - 1 pt*
 ```{r}
+ggplot(data = allDEStatsPairedTime6vs24, mapping = aes(x = logCPM, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "blue", size = 1.0) +
+  stat_smooth(method = "loess", se = FALSE, colour = "red")
 ```
 
 *Now we're going to test loess normalization instead.* 
@@ -251,15 +297,38 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ```{r}
 #Note: the Bioconductor package csaw implements loess regularization in a way that is compatible with edgeR
 ## Tip: use the csaw library to implement the loess regularization
+thing <- normOffsets(y)
+
+designPaired2 = model.matrix(~curSamples$treatment + curSamples$timeName)  
+# we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
+thing = estimateDisp(thing, designPaired2)
+fitPaired2 = glmQLFit(thing, designPaired2)
+qlfPairedTime6vs242 = glmQLFTest(fitPaired2, coef=3) 
+qlfPairedTreatControlvsProtac2 = glmQLFTest(fitPaired2, coef=2)
+allDEStatsPairedTreatControlvsProtac2 = as.data.frame(topTags(qlfPairedTreatControlvsProtac2,n=nrow(countMatrix)))
+allDEStatsPairedTreatControlvsProtac2$region=row.names(allDEStatsPairedTreatControlvsProtac2)
+allDEStatsPairedTime6vs242 = as.data.frame(topTags(qlfPairedTime6vs242,n=nrow(countMatrix)))
+allDEStatsPairedTime6vs242$region=row.names(allDEStatsPairedTime6vs242)
+
 ```
 
 ### `#?#` *Make the same two MA plots as before, but this time using the loess normalized analysis - 1 pt*
 ```{r}
+ggplot(data = allDEStatsPairedTreatControlvsProtac2, mapping = aes(x = logCPM, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "blue", size = 1.0)  +
+  stat_smooth(method = "loess", se = FALSE, colour = "red")
+
+ggplot(data = allDEStatsPairedTime6vs242, mapping = aes(x = logCPM, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "blue", size = 1.0)  +
+  stat_smooth(method = "loess", se = FALSE, colour = "red")
 ```
 
 ### `#?#` *What was the first normalization method? What changed in the MA plots? Which analysis do you think is more reliable and why? - 4 pt*
 
-
+original version was from calcNormFactors(). 
+The thing that changed was the loess line
 
 # Part 4: GC bias
 
@@ -269,14 +338,37 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ```{r}
 #note that the names of your peaks are of the format <chr>:<startPos>-<endPos>
 ## Tip: lookinto the GenomicRanges documentation 
+#print(frames5_filtered$region)
+
+rownames(frames5_filtered) <- frames5_filtered$region
+
+region_info.df <- data.frame(do.call("rbind", strsplit(as.character(frames5_filtered$region), "[:-]")), row.names = frames5_filtered$region )
+colnames(region_info.df) <- c("chr", "startPos", "endPos")
+
+region_info.df
+
+ir <- IRanges(start=as.numeric(region_info.df$startPos), end=as.numeric(region_info.df$endPos))
+gr <- GRanges(seqnames = region_info.df$chr, ranges = ir, names = rownames(region_info.df))
+gr
+
+
 ```
 
 
 ### `#?#` *Extract the genomic DNA sequences for each peak using hg38 - 3 pt*
 *See for relevant documentation: https://bioconductor.org/packages/release/workflows/vignettes/sequencing/inst/doc/sequencing.html *
-```{r, eval = FALSE}
+```{r}
 ## Tip: Use the Biostring library 
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
+
 library(BSgenome.Hsapiens.UCSC.hg38)
+sequences <- getSeq(BSgenome.Hsapiens.UCSC.hg38, gr)
+
+freqs <- alphabetFrequency(sequences)
+gc_content <- (freqs[,'C'] + freqs[,'G'])/rowSums(freqs)
+frames5_filtered$gc <- gc_content
 ```
 
 
@@ -285,31 +377,61 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 ### `#?#` *Create scatter plots (one per sample, e.g. using facet_wrap), including lines of best fit (GAM), where each plot shows GC content (x axis) vs CPM (y axis) for each peak (points) -2pt*
 ```{r}
 #please limit the y axis to between 0 and 50
+
+frame5_filtered_long <- pivot_longer( frames5_filtered, cols = c(R1_24h_control, R1_24h_BI_protac, R1_6h_BI_protac, R1_6h_control, R2_24h_control, R2_24h_BI_protac, R2_6h_BI_protac, R2_6h_control),  names_to = "sample")
+
+ggplot(data = frame5_filtered_long, mapping = aes(x=gc, y =  value)) + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = FALSE) +
+  scale_y_continuous(limits = c(0, 50)) +
+  facet_wrap(~sample)
+
 ```
 
 ### `#?#` *Repeat the above, but this time showing only the lines of best fit and all on the same plot - 2 pt*
 ```{r}
+ggplot(data = frame5_filtered_long, mapping = aes(x=gc, y =  value, colour = sample)) + 
+  geom_smooth(method = "gam", se = FALSE)
 ```
 
 
 ### `#?#` *Given this result, predict whether we will see a significant relationship between GC content and logFC in our differential peak analysis (loess-normalized). Justify your prediction. Predicting "wrong" will not be penalized, as long as your justification is correct. Don't retroactively change your answer. - 2 pt*
 
-
+I predict that I will see a significant relationship between GC content and log fold change. This is because according to the above figure, we can see that from the figure higher GC content (0.6 - 0.8) appears to result in higher read couunts.
 
 
 
 ### `#?#` *Plot the relationship between GC and logFC for the loess-normalized ControlvsProtac analysis. Also include a line of best fit (blue) and y=0 (red) - 2 pt*
 ```{r}
+gc_and_region <- data.frame(frames5_filtered$region, frames5_filtered$gc)
+colnames(gc_and_region) <- c("region", "gc")
+
+allDEStatsPairedTreatControlvsProtac2_gc <- left_join(x = allDEStatsPairedTreatControlvsProtac2, y = gc_and_region, by.y = allDEStatsPairedTreatControlvsProtac2$region, by.x = gc_and_region$region )
+
+ggplot(data = allDEStatsPairedTreatControlvsProtac2_gc, mapping = aes(x = gc, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "red", size = 1.0)  +
+  geom_smooth(method = "loess", se = FALSE, colour = "blue")
+
+
 ```
+
 
 ### `#?#` *Now plot the same thing for the NON loess-normalized ControlvsProtac analysis. - 1 pt*
 ```{r}
+allDEStatsPairedTreatControlvsProtac_gc <- left_join(x = allDEStatsPairedTreatControlvsProtac, y = gc_and_region, by.y = allDEStatsPairedTreatControlvsProtac$region, by.x = gc_and_region$region )
+
+ggplot(data = allDEStatsPairedTreatControlvsProtac_gc, mapping = aes(x = gc, y = logFC)) + 
+  geom_point() +
+  geom_hline(aes(yintercept = 0), colour = "red", size = 1.0)  +
+  geom_smooth(method = "loess", se = FALSE, colour = "blue")
+
 ```
 
 
 ### `#?#` *Was your prediction correct? Do you think we should also account for GC normalization in our differential ATAC analysis? Why/why not? - 3 pt*
 
-
+Yes, my prediction was correct. I think that we should account for GC normalization in differential ATAC analysis. This is because by not accounting for it, it can have a drastic impact on the resulting fold change values.
 
 *We will leave GC normalization as an optional exercise, and will not actually do it here.*
 
@@ -317,7 +439,7 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ### `#?#` *Suppose we perform the analyses above, redoing the differential analysis once more with GC normalization, and also considering that we tested loess and the default normalization methods. Did we P-hack? Why or why not? - 2 pt*
 
-
+P-hacking revolves around the idea that 
 
 *Going forward, we will only use the initial analysis (**not loess normalized**)*
 
