@@ -250,7 +250,7 @@ head(countMatrix)
 ```
 
 *EdgeR is exceptionally versatile, with many different options for analysis. Today, you're going to use the GLM-quasi-likelihood approach to calculate differential accessibility. We are providing the first example analysis below, which you can modify in subsequent steps. You will need to understand what the steps do, so read the appropriate documentation. *
-```{r, eval = FALSE}
+```{r}
 curSamples = samples[match(names(countMatrix), samples$ID),];
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
 y = calcNormFactors(y)
