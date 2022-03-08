@@ -392,7 +392,7 @@ ggplot(data = frame5_filtered_long, mapping = aes(x=gc, y =  value, colour = sam
 
 ### `#?#` *Given this result, predict whether we will see a significant relationship between GC content and logFC in our differential peak analysis (loess-normalized). Justify your prediction. Predicting "wrong" will not be penalized, as long as your justification is correct. Don't retroactively change your answer. - 2 pt*
 
-I predict that I will see a significant relationship between GC content and log fold change. This is because according to the above figure, we can see that from the figure higher GC content (0.6 - 0.8) appears to result in higher read couunts.
+I predict that I will see a significant relationship between GC content and log fold change. This is because according to the above figure, we can see that from the figure higher GC content (0.6 - 0.8) appears to result in higher read counts.
 
 
 
@@ -440,7 +440,7 @@ P-hacking revolves around the idea that we don't know if a given significant fin
 
 ### `#?#` *Now considering the two comparisons (6 vs 24 hours, and protac vs control). EdgeR performed a correction for MHT, but if we want to analyze the results from both comparisons, do we need to re-adjust to account for the fact that we tested two different hypothesis sets (time and treatment)? Why/not? - 2 pt*
 
-Yes. In this context, you have two independent variables, time and treatment.
+Yes. In this context, you have two independent variables, time and treatment. We need to do an analysis to determine if the effects we are observing are a result of a single change versus a reuslt of the two independent variables interacting with each other, which can be done by modelling interaction effects.
 
 
 ### `#?#` *How many differential peaks did you find (FDR<0.01). - 1 pt*
