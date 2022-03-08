@@ -1,9 +1,7 @@
 ---
 title: "Assignment 6: ATAC-seq"
-output:
-  github_document:
-    toc: true
-    toc_depth: 4
+output: github_document
+
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Part 0: Getting ready 
 
-```{r}
+```{r, echo = FALSE}
 #install any of these you might not have already
 library(ggplot2)
 library(edgeR)
@@ -98,12 +96,14 @@ ggplot(data = (atac_reads_joined), mapping = aes(x = ID, y = x, colour = replica
 ```{r}
 #sample with the highest coverage is R1_24h_DMSO
 atac_reads_joined[which.max(atac_reads_joined$x), ]
+#R1_24h_DMSO
 ```
 
 ### `#?#` *Which sample has the least? - 0.5 pt*
 ```{r}
 #sample with min reads is R1_6h_control
 atac_reads_joined[which.min(atac_reads_joined$x), ]
+#R1_6h_control
 ```
 
 ### `#?#` *What is the % difference between the max and min (relative to the min)? - 0.5 pt*
@@ -187,17 +187,13 @@ frames2 <- frames2 %>% remove_rownames %>% column_to_rownames(var="atac_reads_fi
 
 cor_mat <- cor(frames2)
 cor_mat
-heatmap(cor_mat)
-melt_cor <- melt(cor_mat)
-melt_cor
-ggplot(melt_cor, aes(x = X1, y = X2, fill = value)) + geom_tile() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+heatmap(cor_mat, cexRow = 0.5, cexCol = 0.5)
 
 ```
 
 ### `#?#` *What do you expect the correlations between replicates to look like? Is that what you see? - 2 pt*
 
-
+I expected there to be stronger correlations between replicate with similar treatments.  According to the above figure, there overall does not seem to be a strong level of correlation among samples.
 
 *It is common to exclude some regions from analysis. For instance, we won't be able to robustly identify those that are differential but have low coverage even if they are truly differential, so there is no point testing these. We will also remove mitochondrial regions, a common contaminant of ATAC-seq data.*
 
@@ -276,7 +272,7 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ggplot(data = allDEStatsPairedTreatControlvsProtac, mapping = aes(x = logCPM, y = logFC)) + 
   geom_point() +
   geom_hline(aes(yintercept = 0), colour = "blue", size = 1.0)  +
-  stat_smooth(method = "loess", se = FALSE, colour = "red")
+  geom_smooth(method = "loess", se = FALSE, colour = "red")
   
 
 
@@ -439,21 +435,29 @@ Yes, my prediction was correct. I think that we should account for GC normalizat
 
 ### `#?#` *Suppose we perform the analyses above, redoing the differential analysis once more with GC normalization, and also considering that we tested loess and the default normalization methods. Did we P-hack? Why or why not? - 2 pt*
 
-P-hacking revolves around the idea that 
+P-hacking revolves around the idea that we don't know if a given significant finding is actually from the data, or if it from the analytical method used to analyze and interpret the data. In this study, we used multiple normalization methods on the underlying data in order to examine the relationships between the drug and control overtime. After performing all these normalization approaches on our data, we can't really say if the resulting findings are "legitimately" from the data, or if they are simply artifacts from the statistical methods performed. Therefore, we p-hacked.
 
 *Going forward, we will only use the initial analysis (**not loess normalized**)*
 
 ### `#?#` *Now considering the two comparisons (6 vs 24 hours, and protac vs control). EdgeR performed a correction for MHT, but if we want to analyze the results from both comparisons, do we need to re-adjust to account for the fact that we tested two different hypothesis sets (time and treatment)? Why/not? - 2 pt*
 
-
+Yes. In this context, you have two independent variables, time and treatment.
 
 
 ### `#?#` *How many differential peaks did you find (FDR<0.01). - 1 pt*
 ```{r}
+allDEStatsPairedTreatControlvsProtac_FDR_filt <- allDEStatsPairedTreatControlvsProtac[allDEStatsPairedTreatControlvsProtac$FDR < 0.01, ]
+head(allDEStatsPairedTreatControlvsProtac_FDR_filt)
+nrow(allDEStatsPairedTreatControlvsProtac_FDR_filt) # 333 peaks
+
+
 ```
 
 ### `#?#` *Make a volcano plot of the allDEStatsPairedTreatControlvsProtac, with -log10(p-value) on the y axis and logFC on the x. Colour points that are significant at an FDR<0.01. - 2 pt*
 ```{r}
+ggplot(data = allDEStatsPairedTreatControlvsProtac, mapping = aes(x = logFC, y = -log10(PValue), colour = (FDR < 0.01))) + geom_point()
+
+
 ```
 
 
@@ -461,11 +465,12 @@ P-hacking revolves around the idea that
 
 ### `#?#` *Plot the logCPM (x axis) by -log10(Pvalue) (y axis), again colouring by FDR<0.01. - 2 pt*
 ```{r}
+ggplot(data = allDEStatsPairedTreatControlvsProtac, mapping = aes(x = logCPM, y = -log10(PValue), colour = (FDR < 0.01))) + geom_point()
 ```
 
 ### `#?#` *Do you think our initial filtering on peaks with at least 10 reads on average per sample was a good choice? Why or why not?*
 
-
+Yes, I think it was a good choice. These "lowly" expressed regions are likely to be noise within the data, that if included to obscure the signal we are trying to detect in the data.
 
 *At this point there are many other follow ups you can and would do for a real differential analysis, but we leave these as optional exercises. For example:*
 1. Confirming that the differential peaks look correct (e.g. CPM heatmap)
@@ -475,7 +480,7 @@ P-hacking revolves around the idea that
 
 *Knit your assignment as a github_document and submit the resulting .md and this .Rmd to your github, and complete the assignment submission on Canvas. Make sure to include the graphs with your submission. *
  
-
+snooooo
 
 
 # Authors and contributions
