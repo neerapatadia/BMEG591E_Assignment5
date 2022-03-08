@@ -323,8 +323,7 @@ ggplot(data = allDEStatsPairedTime6vs242, mapping = aes(x = logCPM, y = logFC)) 
 
 ### `#?#` *What was the first normalization method? What changed in the MA plots? Which analysis do you think is more reliable and why? - 4 pt*
 
-original version was from calcNormFactors(). 
-The thing that changed was the loess line
+Original version was from calcNormFactors(). The thing that changed was the loess line. I think the loess normalization method is more reliable because the plotted trend line is more centered for the loess normalization method, indicating that the loess method is able to normalize on more noise than the calcNormFactors() method.
 
 # Part 4: GC bias
 
