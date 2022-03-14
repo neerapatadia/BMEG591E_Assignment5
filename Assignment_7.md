@@ -1,43 +1,74 @@
----
-title: 'Assignment 7: PGS'
-output:
-  github_document:
-    toc: true
-    toc_depth: 4
----
+Assignment 7: PGS
+================
+
+  - [Assignment Overview](#assignment-overview)
+  - [Getting Ready](#getting-ready)
+  - [Genotyping Quality Control](#genotyping-quality-control)
+      - [General QC](#general-qc)
+      - [Global Ancestry Investigation](#global-ancestry-investigation)
+      - [a. PCA-specific QC](#a-pca-specific-qc)
+      - [b. PCA computation](#b-pca-computation)
+      - [c. Visualization](#c-visualization)
+  - [Imputation](#imputation)
+  - [Polygenic Scores (PGS)](#polygenic-scores-pgs)
+      - [PGS accuracy](#pgs-accuracy)
+  - [Authors and contributions](#authors-and-contributions)
 
 # Assignment Overview
 
-In this assignment we will learn about population stratification, imputation of genotypes, and using polygenic scores.  Polygenic scores (PGSs) can be useful for predicting disease susceptibility. In order to calculate PGSs, we need two things: GWAS summary statistics (including effect sizes), and genotypes. Most of the time, only a subset of a person's genotypes are actually measured (e.g. via SNP array), and so we must impute the rest using a matched population of fully genotyped individuals. This is the goal of Assignment 7.
+In this assignment we will learn about population stratification,
+imputation of genotypes, and using polygenic scores. Polygenic scores
+(PGSs) can be useful for predicting disease susceptibility. In order to
+calculate PGSs, we need two things: GWAS summary statistics (including
+effect sizes), and genotypes. Most of the time, only a subset of a
+person’s genotypes are actually measured (e.g. via SNP array), and so we
+must impute the rest using a matched population of fully genotyped
+individuals. This is the goal of Assignment 7.
 
-Throughout the assignment we will be using a Mini Cohort that has genetic data and some phenotypic variables, together with the 1000 Genomes Project samples. Both datasets are in bfile plink format, which encompasses 3 files: *.bim, .bed and .fam* all the files can be located under the following path: */projects/bmeg/A7*
+Throughout the assignment we will be using a Mini Cohort that has
+genetic data and some phenotypic variables, together with the 1000
+Genomes Project samples. Both datasets are in bfile plink format, which
+encompasses 3 files: *.bim, .bed and .fam* all the files can be located
+under the following path: */projects/bmeg/A7*
 
+# Getting Ready
 
-# Getting Ready 
+In this assignment, you will use the plink tool extensively. A plink
+tutorial can be found here:
+<https://zzz.bwh.harvard.edu/plink/tutorial.shtml>
 
-In this assignment, you will use the plink tool extensively. A plink tutorial can be found here: https://zzz.bwh.harvard.edu/plink/tutorial.shtml
-
-```{bash, eval=FALSE}
+``` bash
 ## Install plink1.9 onto your A1 conda environment:
 conda install -c bioconda plink
 ```
 
-
 # Genotyping Quality Control
-
 
 ## General QC
 
-Before we can start working on the genetic data, we need to ensure that the quality is adequate. Thus, we are gonna check the following measuring for our MiniCohort:
+Before we can start working on the genetic data, we need to ensure that
+the quality is adequate. Thus, we are gonna check the following
+measuring for our MiniCohort:
 
-   1. **SNP call rate:** The call rate represents the percentage of participants with non-missing data for that SNP. Removing variants with a call rate lower than 95% avoids potential wrong calls to be included in further analysis
-   
-   2. **Minor Allele Frequency:** The minor allele frequency (MAF) echoes the less common allele frequency across the population. The MAF estimates tend to be more accurate for higher MAFs and the population sample size the MAF was based on. If there are too few samples representing the rare-allele, is hard to distinguish between a true rare-allele and sequencing errors.
-   
-   3. **Sample call rate:** Similar to SNP call rate, it allows to filter out all samples exceeding 98% missing genetic variants out of all the  calls. 
-   
+1.  **SNP call rate:** The call rate represents the percentage of
+    participants with non-missing data for that SNP. Removing variants
+    with a call rate lower than 95% avoids potential wrong calls to be
+    included in further analysis
 
-```{bash, eval=FALSE}
+2.  **Minor Allele Frequency:** The minor allele frequency (MAF) echoes
+    the less common allele frequency across the population. The MAF
+    estimates tend to be more accurate for higher MAFs and the
+    population sample size the MAF was based on. If there are too few
+    samples representing the rare-allele, is hard to distinguish between
+    a true rare-allele and sequencing errors.
+
+3.  **Sample call rate:** Similar to SNP call rate, it allows to filter
+    out all samples exceeding 98% missing genetic variants out of all
+    the calls.
+
+<!-- end list -->
+
+``` bash
 ## Using only one run of plink 1.9 (with different flags)
 ## 1. Filter out -SNPs- with more than 5% missingness
 ## 2. Filter out -variants- with less than 1% MAF
@@ -45,23 +76,39 @@ Before we can start working on the genetic data, we need to ensure that the qual
 ## 4. Create an output file in bfile format (which contains the bed, fam and bim files) for the MiniCohort QCed data
 #?# Type the command you used below: - 3pt
 plink --bfile /projects/bmeg/A7/Mini_cohort --geno 0.05 --maf 0.01 --mind 0.02 --make-bed --out filtered_mini
-
 ```
-
 
 ## Global Ancestry Investigation
 
-In order to enhance imputation accuracy when dealing with ethnically diverse cohorts is important to understand the genetic ancestries of the cohort's participants. Knowing the ancestral populations will ensure that the most closely related population is used as a reference for the imputation. For instance, one would not want to impute haplotypes of an individual of Yoruban ancestry with a population of East Asians because many of the haplotypes will differ between the two ancestries, leading to imputing the wrong variants for the Yoruban person. Hence, we will analyze the global ancestry of our cohort using Principal Component Analysis (PCA). PCA is an unsupervised, unbiased way to reduce the complexity of multidimensional.
+In order to enhance imputation accuracy when dealing with ethnically
+diverse cohorts is important to understand the genetic ancestries of the
+cohort’s participants. Knowing the ancestral populations will ensure
+that the most closely related population is used as a reference for the
+imputation. For instance, one would not want to impute haplotypes of an
+individual of Yoruban ancestry with a population of East Asians because
+many of the haplotypes will differ between the two ancestries, leading
+to imputing the wrong variants for the Yoruban person. Hence, we will
+analyze the global ancestry of our cohort using Principal Component
+Analysis (PCA). PCA is an unsupervised, unbiased way to reduce the
+complexity of multidimensional.
 
 ## a. PCA-specific QC
 
-We first need to ensure that only the most informative genetic variants are used in the analysis. To do this, we will: 
+We first need to ensure that only the most informative genetic variants
+are used in the analysis. To do this, we will:
 
-   1. **Filter out high linkage disequilibrium (LD) regions:** Because high LD regions will add redundancy to the PCA (leading to these regions dominating top PCs), they need to be removed. 
-   
-   2. **LD pruning:** Similarly, LD causes redundancy even outside the particularly problematic high-LD regions. Thus, we will use LD-pruning to identify variants that are in LD, and select one per block.
-   
-```{bash, eval=FALSE}
+1.  **Filter out high linkage disequilibrium (LD) regions:** Because
+    high LD regions will add redundancy to the PCA (leading to these
+    regions dominating top PCs), they need to be removed.
+
+2.  **LD pruning:** Similarly, LD causes redundancy even outside the
+    particularly problematic high-LD regions. Thus, we will use
+    LD-pruning to identify variants that are in LD, and select one per
+    block.
+
+<!-- end list -->
+
+``` bash
 ## Using only one run of plink 1.9 (with different flags)
 ## 1. Filter out the high-LD regions contained in the --high_LD_regions_hg19.txt-- file, located in /projects/bmeg/A7/
 ## 2. Use the --indep-pairwise to do LD prunning with the following parameters:
@@ -77,14 +124,16 @@ plink --bfile filtered_mini --exclude /projects/bmeg/A7/high_LD_regions_hg19.txt
 #?# Type the commands you used below: - 3pt
 plink --bfile filtered_mini --exclude filtered_mini_ld.prune.in --make-bed --out mini_extract
 plink --bfile /projects/bmeg/A7/1kgp_reference --exclude filtered_mini_ld.prune.in --make-bed --out 1kgp_extract
-
 ```
 
 ## b. PCA computation
 
-To assess the ethnic diversity in our cohort, we will use One-thousand Genome Project (1KGP) data as a reference for our PCA analysis. These dataset has genetic information of major continental populations: Admixed American (AMR), European (EU), Asian (AS) and African (A). 
+To assess the ethnic diversity in our cohort, we will use One-thousand
+Genome Project (1KGP) data as a reference for our PCA analysis. These
+dataset has genetic information of major continental populations:
+Admixed American (AMR), European (EU), Asian (AS) and African (A).
 
-```{bash, eval=FALSE}
+``` bash
 ## Merge your pruned bfiles of the Mini_cohort and the 1KGP created on the previous step 
 ## Remember to create a new bfile (.fam, .bed and .bim files) that contains the merged data.
 ## IMPORTANT TIME CONSTRAINT: This step can take ~15 minutes, so make sure to check the server status before you run it!
@@ -95,12 +144,11 @@ plink --bfile mini_extract --bmerge 1kgp_extract.bed 1kgp_extract.bim 1kgp_extra
 
 #?# Perform a PCA analysis in plink on the merged set - 1 pt
 plink --bfile merge_files --pca
-
 ```
 
-## c. Visualization
+## c. Visualization
 
-```{r}
+``` r
 library(ggplot2)
 ## Copy the PCA .eigenvec file to your computer, together with the samples_info.txt located in /projects/bmeg/A7/
 ## Load the .eigenvec file onto R, change the column names to: FID, IID, PC1, PC2, PC3, ..., PC20
@@ -123,8 +171,11 @@ merged_df <- merge(eigen_load, samps_info, by.x = "V2", by.y = "FID")
 ## color: SuperPopulation - to use the Population information to color the samples and be able to appreciate population structure!
 #?# Type the command you used below: 1pt
 ggplot(data = merged_df, mapping = aes(x = V3, y = V4, colour = SuperPopulation)) + geom_point()
+```
 
+![](Assignment_7_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
+``` r
 #?# Where do the cohort samples fall? Are they all clustered together? - 1 pt
 
 
@@ -132,16 +183,17 @@ ggplot(data = merged_df, mapping = aes(x = V3, y = V4, colour = SuperPopulation)
 
 
 #?# Do you think looking at the top two PCs is sufficient to tell what population is best? Why/why not? - 2 pt
-
-
-
 ```
 
 # Imputation
 
-Imputation of genetic data is a very computationally intensive analysis, that can take a long time. So we have performed it for you. Using the chromosome 17 imputation information located in */projects/bmeg/A7/* under the *Mini_cohort_chr17_imputation_results.info.gz* we will calculate some post-imputation metrics. 
+Imputation of genetic data is a very computationally intensive analysis,
+that can take a long time. So we have performed it for you. Using the
+chromosome 17 imputation information located in */projects/bmeg/A7/*
+under the *Mini\_cohort\_chr17\_imputation\_results.info.gz* we will
+calculate some post-imputation metrics.
 
-```{r, eval = FALSE}
+``` r
 ## Load the Mini_cohort_chr17_imputation_results.info.gz file to your Rstudio environment 
 #chr_info <- read.table(file = "/Users/paola.arguello/Documents/BMEDG400/Assignment_Keys/2021Jan/Assignment_7/Mini_cohort_chr17_imputation_results.info.gz",
  #                            header = TRUE)
@@ -154,23 +206,34 @@ Imputation of genetic data is a very computationally intensive analysis, that ca
 #?# What is the maximum MAF? Why is that? - 1 pt
 ```
 
-# Polygenic Scores (PGS) 
+# Polygenic Scores (PGS)
 
-A GWAS for affinity for tapas (the Spanish appetizer) was performed and 199 SNPs were found significantly associated. The significant SNPs and their assigned effect sizes are described in the *Tapas_enjoyability_GWAS_sumStats.txt* file. Thanks to the imputation performed in our MiniCohort, we were able to obtain the dosages (double risk alleles=2, one risk allele=1, no risk alleles=0) for each one of the SNPs associated to the Tapas 'enjoyability', described in the *MiniCohort_Tapas_SNPdosages.txt*. 
+A GWAS for affinity for tapas (the Spanish appetizer) was performed and
+199 SNPs were found significantly associated. The significant SNPs and
+their assigned effect sizes are described in the
+*Tapas\_enjoyability\_GWAS\_sumStats.txt* file. Thanks to the imputation
+performed in our MiniCohort, we were able to obtain the dosages (double
+risk alleles=2, one risk allele=1, no risk alleles=0) for each one of
+the SNPs associated to the Tapas ‘enjoyability’, described in the
+*MiniCohort\_Tapas\_SNPdosages.txt*.
 
-PGS are calculated by multiplying the effect sizes of each SNP by the dosage of an individual for those SNP and then adding together all the effectSize x dosage. The formula is outlined below, where:
+PGS are calculated by multiplying the effect sizes of each SNP by the
+dosage of an individual for those SNP and then adding together all the
+effectSize x dosage. The formula is outlined below, where:
 
   - i: individual of which you are calculating the PGS
-  
-  - j: SNP that has been found to be associated to the trait (Tapas enjoyability in this case)
+
+  - j: SNP that has been found to be associated to the trait (Tapas
+    enjoyability in this case)
 
   - Beta: Effect size
 
-  - dosage: number of risk alleles the *individual i* has of the *risk allele j*? (2,1 or 0)
+  - dosage: number of risk alleles the *individual i* has of the *risk
+    allele j*? (2,1 or 0)
 
 ![](PGS_formula.png)
 
-```{r}
+``` r
 ## Load to your RStudio:
 ## 1.  -Tapas_enjoyability_GWAS_sumStats.txt-
 ## 2.  -MiniCohort_Tapas_SNPdosages.txt- 
@@ -186,7 +249,7 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 
 ## PGS accuracy
 
-```{r}
+``` r
 ## The Tapas enjoyability was measured in a range of 0-1, with 0 being hating tapas and 1 being completely in love with tapas.
 ## This tapas likability is captured in the "Tapas_enjoyability" column of the -MiniCohort_Tapas_SNPdosages.txt- file. 
 #?# Make a scatterplot with a linear regression line, where x is the Tapas-PGS and y is their actual Tapas enjoyability - 2 pt
@@ -195,10 +258,11 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 #?# How predictive is the PGS for tapas preference? Include in your answer why do you think it is/isn't accurate and what could affect its predicitvity - 2pt 
 ```
 
-
 # Authors and contributions
 
-Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment. If you worked alone, only the author (e.g. your name and student ID) should be included.
+Following completion of your assignment, please fill out this section
+with the authors and their contributions to the assignment. If you
+worked alone, only the author (e.g. your name and student ID) should be
+included.
 
 Authors: Neera Patadia (79557773)
-
