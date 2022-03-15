@@ -178,11 +178,33 @@ ggplot(data = merged_df, mapping = aes(x = V3, y = V4, colour = SuperPopulation)
 ``` r
 #?# Where do the cohort samples fall? Are they all clustered together? - 1 pt
 
+#Based on the above plot, three main clusters can immediately be identified.
+#The European (red), East Asian (green), and Eurpean (teal) cluster quite distinctly 
+#from each other. The American (brown), Mini cohort (blue) and SAS (pink) populations 
+#overlap with each other, but the SAS data appears to cluster more tightly
+#than the america population.
+
 
 #?# Which Population would you use as a reference for imputation?, Why? - 1 pt
+# I would assume that I would want to use a population that encompasses a lot
+# of variation (ie. doesn't cluster as tightly together on the PC plot) because 
+# you would want to be able to best represent variation observed across multiple 
+# populations. From the figure, we can see that AMR does not cluster as close 
+# together, which indicates to me that it should be able to capture more of the 
+# variation in the population, making it the best population to choose for data 
+# imputation.
 
 
 #?# Do you think looking at the top two PCs is sufficient to tell what population is best? Why/why not? - 2 pt
+# I would say yes, because the majority of the variance between the population 
+# can be extracted from the top two ranked PCs. This is backed up by looking at 
+# the eigen values, which can be used to quantify the "amount" of variance that 
+# is a result of each PC. From the eigen values calculated from plink, we can 
+# see that PC1 and 2 have eigen values of 212.983 and 104.46 respectively. Compare 
+# this to the other PC eigen values, which are much smaller (ranging from 29.8641
+# to 1.83), indicating that the explain a much smaller proportion of the variance
+# observed in the data. Therefore, I conclude that looking at the top two PCs
+# are enough to examine what population is best for analysis
 ```
 
 # Imputation
