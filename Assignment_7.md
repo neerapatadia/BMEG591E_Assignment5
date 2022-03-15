@@ -170,7 +170,9 @@ merged_df <- merge(eigen_load, samps_info, by.x = "V2", by.y = "FID")
 ## y-axis: PC2
 ## color: SuperPopulation - to use the Population information to color the samples and be able to appreciate population structure!
 #?# Type the command you used below: 1pt
-ggplot(data = merged_df, mapping = aes(x = V3, y = V4, colour = SuperPopulation)) + geom_point()
+ggplot(data = merged_df, mapping = aes(x = V3, y = V4, colour = SuperPopulation)) + 
+  geom_point() +
+  xlab("PC1") + ylab("PC2")
 ```
 
 ![](Assignment_7_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
@@ -301,6 +303,7 @@ mini_tapas <- read.table("MiniCohort_Tapas_SNPdosages.txt", header = TRUE)
 #?# Include your rationale and the documented code you used - 5pt
 
 # get number of individuals and initilize empty list
+
 mini_tapas_effect <- mini_tapas # assign original dataframe to one that can be manipulated
 
 for (snp in tapas_enjoy$SNP) { #iterate through each SNP with an effect size
