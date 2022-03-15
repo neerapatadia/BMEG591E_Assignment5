@@ -185,8 +185,10 @@ ggplot(data = chr_info, mapping = aes(x = MAF)) + geom_histogram(bins = 100)
 #?# What is the maximum MAF? Why is that? - 1 pt
 max(chr_info$MAF)
 # highest allele frequency is 0.5
-# minor alleles should not comprise more than half the total population,
-# as they would no longer be minor allele frequencies.
+# The value of 0.5 makes sense because the minor allele frequency is supposed 
+# represent the frequency of the allele that is nor present in the majority of 
+# individuals. Therefore, the highest the minor allele frequency could ever be 
+# is 0.5. 
 
 ```
 
@@ -218,29 +220,24 @@ mini_tapas <- read.table("MiniCohort_Tapas_SNPdosages.txt", header = TRUE)
 #?# Include your rationale and the documented code you used - 5pt
 
 # get number of individuals and initilize empty list
-prs_all <- list()
+mini_tapas_effect <- mini_tapas # assign original dataframe to one that can be manipulated
 
-for (snp in tapas_enjoy$SNP) { #iterate through each snp with effect size
-  effect_size <- tapas_enjoy$Effect_Size[tapas_enjoy$SNP == snp] # get effectsize value corresponding to the snp
+for (snp in tapas_enjoy$SNP) { #iterate through each SNP with an effect size
+  effect_size <- tapas_enjoy$Effect_Size[tapas_enjoy$SNP == snp] # pull effect size
   
-  if (snp %in% colnames(mini_tapas)) { # check if snp is in the columns of the tapas dosage dataframe
-    dosage <- list(mini_tapas[[snp]]) # pull all dosage values based on queried snp
-    
-    for (dose in dosage){ # calculate effect * dose for each sample
-      effect_by_dose <- dose * effect_size
-    }
-
-    prs_add_value <- sum(effect_by_dose) # get sum of all effect by dose values to calc prs
-    prs_all <- append(prs_all, list(prs_add_value )) #add all prs to list
-    
+  if (snp %in% colnames(mini_tapas)) { # check if SNP in mini_tapas
+    colno <- which(colnames(mini_tapas) %in% snp) # get the column index that matches the SNP
+    mini_tapas_effect[colno] <- mini_tapas[colno] * effect_size # multiply each dosage by the effect size corresponding to a given snp
   }
   
   else {
     print("No Match")
   }
+  
 }
 
-prs_all <- unlist(prs_all, recursive = FALSE) # formatting of list
+prs_all <- rowSums(mini_tapas_effect[,3:201]) # compute sums of dosage * effect_size for each sample 
+prs_df <- data.frame(prs_all, mini_tapas_effect$IID) # make dataframe prs corresponding to each sample
 
 
 #?# Use ggplot to plot the distribution of the Tapas PGS: - 2 pt
@@ -252,8 +249,7 @@ ggplot(data = prs_df, mapping = aes(x = prs_all)) +
   geom_density(alpha=.2, fill="#FF6666")
 
 #?# What is the distribution of the tapas PGS? - 1pt
-# appears to follow a somewhat normal distribution (wouldn't really say bimodal
-#cause the dip is very small)
+# appears to follow a somewhat a somewhat bimodal distribution.
 
 ```
 
@@ -264,8 +260,31 @@ ggplot(data = prs_df, mapping = aes(x = prs_all)) +
 ## This tapas likability is captured in the "Tapas_enjoyability" column of the -MiniCohort_Tapas_SNPdosages.txt- file. 
 #?# Make a scatterplot with a linear regression line, where x is the Tapas-PGS and y is their actual Tapas enjoyability - 2 pt
 ## Tip: http://www.sthda.com/english/wiki/ggplot2-scatter-plots-quick-start-guide-r-software-and-data-visualization
+mini_tapas_effect$prs <- prs_df$prs_all
+
+ggplot(data = mini_tapas_effect, mapping = aes (x = prs, y = Tapas_enjoyability)) + 
+  geom_point() +
+  geom_smooth(method=lm)
+  
+
 #?# What is the correlation coefficient between the PGS and Tapas enjoyability? Is Spearman or Pearson correlation more appropriate here? Why? - 3 pt
+# in this case we should use the Pearson correlation. Pearson correlation evaluates 
+# the linear relationship between two continuous variables. Also for the data 
+# we are working with, we can make the assumption that the higher the prs, the
+# higher the Tapas enjoyment, which is a linear relationship.
+
+p_cor <- cor(x = mini_tapas_effect$prs, y = mini_tapas_effect$Tapas_enjoyability, method = "pearson")
+p_cor
+
 #?# How predictive is the PGS for tapas preference? Include in your answer why do you think it is/isn't accurate and what could affect its predicitvity - 2pt 
+
+# with a pearson correlation value of 0.14, PGS is not really predictive of tapas
+# preference. There are many things that could affect the predictivity, as taste
+# enjoyment can be very subjective among individuals. Additionally, the results
+# may be influenced by that fact that there is very small number of samples 
+# that are used in the analysis (63). It could be the case that more samples would
+# improve the overall statistical power of the analysis. 
+
 ```
 
 
