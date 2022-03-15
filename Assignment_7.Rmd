@@ -211,13 +211,50 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 ## 1.  -Tapas_enjoyability_GWAS_sumStats.txt-
 ## 2.  -MiniCohort_Tapas_SNPdosages.txt- 
 ## Both are located in the A7 directory on github.
+tapas_enjoy <- read.table("Tapas_enjoyability_GWAS_sumStats.txt", header = TRUE)
+mini_tapas <- read.table("MiniCohort_Tapas_SNPdosages.txt", header = TRUE)
+
 ## Using the base PRS formula outlined below, calculate the Tapas enjoyability PGS for the individuals in the Mini Cohort 
 #?# Include your rationale and the documented code you used - 5pt
+
+# get number of individuals and initilize empty list
+prs_all <- list()
+
+for (snp in tapas_enjoy$SNP) { #iterate through each snp with effect size
+  effect_size <- tapas_enjoy$Effect_Size[tapas_enjoy$SNP == snp] # get effectsize value corresponding to the snp
+  
+  if (snp %in% colnames(mini_tapas)) { # check if snp is in the columns of the tapas dosage dataframe
+    dosage <- list(mini_tapas[[snp]]) # pull all dosage values based on queried snp
+    
+    for (dose in dosage){ # calculate effect * dose for each sample
+      effect_by_dose <- dose * effect_size
+    }
+
+    prs_add_value <- sum(effect_by_dose) # get sum of all effect by dose values to calc prs
+    prs_all <- append(prs_all, list(prs_add_value )) #add all prs to list
+    
+  }
+  
+  else {
+    print("No Match")
+  }
+}
+
+prs_all <- unlist(prs_all, recursive = FALSE) # formatting of list
+
+
 #?# Use ggplot to plot the distribution of the Tapas PGS: - 2 pt
 ## Include the code and the graph in your analysis! 
 ## Tip: http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/
- 
+prs_df <- data.frame(prs_all)
+ggplot(data = prs_df, mapping = aes(x = prs_all)) + 
+  geom_histogram(bins = 30, aes(y= ..density..)) +
+  geom_density(alpha=.2, fill="#FF6666")
+
 #?# What is the distribution of the tapas PGS? - 1pt
+# appears to follow a somewhat normal distribution (wouldn't really say bimodal
+#cause the dip is very small)
+
 ```
 
 ## PGS accuracy
