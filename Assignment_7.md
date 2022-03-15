@@ -217,15 +217,47 @@ calculate some post-imputation metrics.
 
 ``` r
 ## Load the Mini_cohort_chr17_imputation_results.info.gz file to your Rstudio environment 
-#chr_info <- read.table(file = "/Users/paola.arguello/Documents/BMEDG400/Assignment_Keys/2021Jan/Assignment_7/Mini_cohort_chr17_imputation_results.info.gz",
- #                            header = TRUE)
+chr_info <- read.table(file = "Mini_cohort_chr17_imputation_results.info" , header = TRUE)
 ## Use the information in the file to answer the following questions. Accompany each of the answers with the code you used to get to them and a brief explanation of your thought process behind.
 #?# What is the percentage of imputed SNPs? 0.5 pt
+geno_freq <- data.frame(table(chr_info$Genotyped))
+imputed_snp_freq <- (geno_freq$Freq[2]/nrow(chr_info))*100
+imputed_snp_freq
+```
+
+    ## [1] 99.29754
+
+``` r
 ## The metric of imputation quality is Rsq, this is the estimated value of the squared correlation between imputed and true genotypes. Since true genotypes are not available, this calculation is based on the idea that poorly imputed genotype counts will shrink towards their expectations based on allele frequencies observed in the population (https://genome.sph.umich.edu/wiki/Minimac3_Info_File#Rsq).  An Rsq < 0.3 is often used to flag poorly imputed SNPs. 
 #?# What is the percentage of poorly imputed SNPs?
+poor_impute <- (sum(chr_info$Rsq < 0.3 & chr_info$Genotyped == "Imputed")/sum(chr_info$Genotyped == "Imputed"))*100
+poor_impute
+```
+
+    ## [1] 63.86188
+
+``` r
 #?# Create a histogram to visualize the distribution of the MAF - 1 pt
+ggplot(data = chr_info, mapping = aes(x = MAF)) + geom_histogram(bins = 100)
+```
+
+![](Assignment_7_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
 #?# Which MAF is most frequent? What does that mean? - 1 pt
+# 0 is the most frequent minor allele frequency, which means that most SNPs were
+# not detected in the population.
+
 #?# What is the maximum MAF? Why is that? - 1 pt
+max(chr_info$MAF)
+```
+
+    ## [1] 0.5
+
+``` r
+# highest allele frequency is 0.5
+# minor alleles should not comprise more than half the total population,
+# as they would no longer be minor allele frequencies.
 ```
 
 # Polygenic Scores (PGS)
